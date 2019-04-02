@@ -1,18 +1,60 @@
 package com.lambton.daianaiziatov.smartnotes.Database;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.lambton.daianaiziatov.smartnotes.StringArrayConverter;
 
 import java.sql.Date;
 import java.util.ArrayList;
 
-public class Note {
+public class Note implements Parcelable {
 
-    private String noteId;
-    private String details;
+    private String noteId = "";
+    private String details = "";
     private Date date;
-    private double locationLatitude;
-    private double locationLongitude;
-    private ArrayList<String> recordings;
+    private double locationLatitude = 0.0;
+    private double locationLongitude = 0.0;
+    private ArrayList<String> recordings = new ArrayList<>();
+
+    public Note() {
+    }
+
+    protected Note(Parcel in) {
+        noteId = in.readString();
+        details = in.readString();
+        date = new Date(in.readLong());
+        locationLatitude = in.readDouble();
+        locationLongitude = in.readDouble();
+        recordings = in.createStringArrayList();
+    }
+
+    public static final Creator<Note> CREATOR = new Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(noteId);
+        dest.writeString(details);
+        dest.writeLong(getDateAsLong());
+        dest.writeDouble(locationLatitude);
+        dest.writeDouble(locationLongitude);
+        dest.writeStringList(recordings);
+    }
 
     public String getNoteId() {
         return noteId;
@@ -77,4 +119,5 @@ public class Note {
     public void setRecordingsFromString(String recordings) {
         this.recordings = StringArrayConverter.convertStringToArray(recordings);
     }
+
 }
