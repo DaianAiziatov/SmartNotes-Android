@@ -2,6 +2,8 @@ package com.lambton.daianaiziatov.smartnotes;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,12 +16,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.text.Html;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -50,6 +54,7 @@ public class ShowNoteActivity extends AppCompatActivity {
 
     private static final String TAG = ShowNoteActivity.class.getSimpleName();
     public static final int REQUEST_IMAGE = 100;
+    public static final int REQUEST_LOCATION = 200;
 
     @BindView(R.id.noteEditText)
     EditText noteEditText;
@@ -57,6 +62,8 @@ public class ShowNoteActivity extends AppCompatActivity {
     Note note;
     private DatabaseNote databaseNote;
     private String savedStateOfNote;
+    private double lattitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +73,8 @@ public class ShowNoteActivity extends AppCompatActivity {
         databaseNote = new DatabaseNote(this);
         note = getIntent().getParcelableExtra("note");
         if (note != null) {
+            lattitude = note.getLocationLatitude();
+            longitude = note.getLocationLongitude();
             savedStateOfNote = note.getDetails();
             Html.ImageGetter imageGetter = new Html.ImageGetter() {
                 @Override
@@ -77,6 +86,13 @@ public class ShowNoteActivity extends AppCompatActivity {
             };
             noteEditText.setText(Html.fromHtml(note.getDetails(), imageGetter, null));
         }
+    }
+
+    @Override
+    protected void onPause() {
+        save();
+        super.onPause();
+        Log.d("TEST", "Note paused");
     }
 
     @Override
@@ -97,7 +113,20 @@ public class ShowNoteActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+        } else if (requestCode == REQUEST_LOCATION) {
+            if (resultCode == Activity.RESULT_OK) {
+                lattitude = data.getDoubleExtra("lattitude", 0.0);
+                longitude = data.getDoubleExtra("longitude", 0.0);
+                save();
+                Log.d("TEST", "Getting location: " + lattitude + ":" + longitude);
+            }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_show_note, menu);
+        return true;
     }
 
     @Override
@@ -107,6 +136,11 @@ public class ShowNoteActivity extends AppCompatActivity {
                 save();
                 finish();
                 break;
+            case R.id.action_map:
+                Intent intent = new Intent(this, MapsActivity.class);
+                intent.putExtra("lattitude", lattitude);
+                intent.putExtra("longitude", longitude);
+                startActivityForResult(intent, REQUEST_LOCATION);
         }
         return true;
     }
@@ -197,7 +231,8 @@ public class ShowNoteActivity extends AppCompatActivity {
     }
 
     private void save() {
-        if (!noteEditText.getText().equals(savedStateOfNote)) {
+        if (!noteEditText.getText().equals(savedStateOfNote) ||
+                lattitude != 0 && longitude != 0) {
             Note newNote;
             boolean isNew = true;
             if (note != null) {
@@ -213,6 +248,8 @@ public class ShowNoteActivity extends AppCompatActivity {
             Log.d(TAG, htmlDetails);
             newNote.setDetails(htmlDetails);
             newNote.setDate(new Date(new java.util.Date().getTime()));
+            newNote.setLocationLatitude(lattitude);
+            newNote.setLocationLongitude(longitude);
             if (isNew) {
                 databaseNote.insert(newNote);
                 Log.d("TEST", "Successfully saved");
