@@ -2,14 +2,17 @@ package com.lambton.daianaiziatov.smartnotes;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,7 +69,7 @@ public class NotesListActivity extends AppCompatActivity implements SearchView.O
     protected void onResume() {
         super.onResume();
         notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "ASC");
-        notesListAdapter.notifyDataSetChanged();
+        notesListAdapter.updateNotesList(notes);
     }
 
     @Override
@@ -110,10 +113,33 @@ public class NotesListActivity extends AppCompatActivity implements SearchView.O
 
     @Override
     public void recyclerViewListClicked(View v, int position) {
-        Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show();
         Note selectedNote = notesListAdapter.getNotesArrayList().get(position);
         Intent intent = new Intent(this, ShowNoteActivity.class);
         intent.putExtra("note", selectedNote);
         this.startActivity(intent);
+    }
+
+    @Override
+    public void recyclerViewListLongClicked(View v, int position) {
+        Toast.makeText(this,"LONG CLICKED", Toast.LENGTH_SHORT);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete this note?");
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                databaseNote.deleteByID(notes.get(position).getNoteId());
+                notes.remove(position);
+                notesListAdapter.updateNotesList(notes);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 }

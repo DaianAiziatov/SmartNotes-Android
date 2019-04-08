@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -18,9 +17,9 @@ import android.text.Html;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -49,7 +48,7 @@ public class ShowNoteActivity extends AppCompatActivity {
     public static final int REQUEST_IMAGE = 100;
 
     @BindView(R.id.noteEditText)
-    EditText noteEdittext;
+    EditText noteEditText;
 
     Note note;
     private DatabaseNote databaseNote;
@@ -64,20 +63,14 @@ public class ShowNoteActivity extends AppCompatActivity {
         note = getIntent().getParcelableExtra("note");
         if (note != null) {
             savedStateOfNote = note.getDetails();
-            noteEdittext.setText(savedStateOfNote);
+            noteEditText.setText(Html.fromHtml(note.getDetails()));
         }
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         save();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        save();
+        finish();
     }
 
     @Override
@@ -86,16 +79,24 @@ public class ShowNoteActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getParcelableExtra("path");
                 try {
-                    // You can update this bitmap to your server
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-
-                    // loading profile image from local cache
                     appendToText(uri.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                save();
+                finish();
+                break;
+        }
+        return true;
     }
 
     @OnClick(R.id.fab_add_image)
@@ -123,9 +124,9 @@ public class ShowNoteActivity extends AppCompatActivity {
 
     private void appendToText(String url) {
         Log.d(TAG, "Image cache path: " + url);
-        int position = Selection.getSelectionStart(noteEdittext
+        int position = Selection.getSelectionStart(noteEditText
                 .getText());
-        SpannableString spannableString = new SpannableString(noteEdittext.getText());
+        SpannableString spannableString = new SpannableString(" ");
         GlideApp.with(this)
                 .asBitmap()
                 .load(url)
@@ -134,9 +135,9 @@ public class ShowNoteActivity extends AppCompatActivity {
                     public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                         Drawable image = new BitmapDrawable(getResources(), resource);
                         image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
-                        ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BASELINE);
-                        spannableString.setSpan(imageSpan, 0, 3, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-                        noteEdittext.getText().insert(position, spannableString);
+                        ImageSpan imageSpan = new ImageSpan(image, url, ImageSpan.ALIGN_BASELINE);
+                        spannableString.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+                        noteEditText.getText().insert(position, spannableString);
                     }
                 });
     }
@@ -184,7 +185,7 @@ public class ShowNoteActivity extends AppCompatActivity {
     }
 
     private void save() {
-        if (!noteEdittext.getText().equals(savedStateOfNote)) {
+        if (!noteEditText.getText().equals(savedStateOfNote)) {
             Note newNote;
             boolean isNew = true;
             if (note != null) {
@@ -195,13 +196,17 @@ public class ShowNoteActivity extends AppCompatActivity {
                 newNote.setNoteId(UUID.randomUUID().toString());
                 note = newNote;
             }
-            newNote.setDetails(noteEdittext.getText().toString());
+            Spannable spannable = noteEditText.getText();
+            String htmlDetails = Html.toHtml(spannable);
+            Log.d(TAG, htmlDetails);
+            newNote.setDetails(htmlDetails);
             newNote.setDate(new Date(new java.util.Date().getTime()));
             if (isNew) {
                 databaseNote.insert(newNote);
             } else {
                 databaseNote.update(newNote);
             }
+            Log.d("TEST", databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "ASC").size() + " items in notes (from show)");
             Toast.makeText(this, "Successfully saved", Toast.LENGTH_SHORT).show();
         }
     }
