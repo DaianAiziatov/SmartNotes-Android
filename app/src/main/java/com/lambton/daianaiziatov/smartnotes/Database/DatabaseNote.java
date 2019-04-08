@@ -25,6 +25,7 @@ public class DatabaseNote {
 
     public void insert(Note note) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
+        database.beginTransaction();
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_NOTE_ID, note.getNoteId());
         contentValues.put(KEY_NOTE_DETAILS, note.getDetails());
@@ -33,12 +34,15 @@ public class DatabaseNote {
         contentValues.put(KEY_NOTE_LATITUDE, note.getLocationLatitude());
         contentValues.put(KEY_NOTE_RECORDINGS, note.getRecordingsAsString());
         database.insert(TABLE_NAME, null, contentValues);
+        database.setTransactionSuccessful();
+        database.endTransaction();
         database.close();
     }
 
     public void update(Note note) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        database.beginTransaction();
         contentValues.put(KEY_NOTE_DETAILS, note.getDetails());
         contentValues.put(KEY_NOTE_DATE, note.getDateAsLong());
         contentValues.put(KEY_NOTE_LONGITUDE, note.getLocationLongitude());
@@ -50,10 +54,12 @@ public class DatabaseNote {
                         {
                                 String.valueOf(note.getNoteId())
                         });
+        database.setTransactionSuccessful();
+        database.endTransaction();
         database.close();
     }
 
-    public void deleteByID(int noteId) {
+    public void deleteByID(String noteId) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         database.delete(TABLE_NAME, KEY_NOTE_ID + "=?",
                 new String[]

@@ -1,10 +1,12 @@
 package com.lambton.daianaiziatov.smartnotes;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,8 +62,14 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.Note
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
         String date = dateFormat.format(note.getDate());
         String subtitle = date + " - " + details;
-        holder.titleTextView.setText(title);
-        holder.subtitleTextView.setText(subtitle);
+        holder.titleTextView.setText(Html.fromHtml(title).toString());
+        holder.subtitleTextView.setText(Html.fromHtml(subtitle).toString());
+    }
+
+    public void updateNotesList(ArrayList<Note> newNotes) {
+        this.notesArrayList.clear();
+        this.notesArrayList.addAll(newNotes);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -81,7 +89,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.Note
         return notesArrayList;
     }
 
-    public class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         @BindView(R.id.titleTextView)
         TextView titleTextView;
@@ -93,13 +101,20 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.Note
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            //Toast.makeText(v.getContext(), "click", Toast.LENGTH_SHORT).show();
             itemListener.recyclerViewListClicked(v, this.getLayoutPosition());
             notifyDataSetChanged();
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            itemListener.recyclerViewListLongClicked(v, this.getLayoutPosition());
+            notifyDataSetChanged();
+            return true;
         }
     }
 
