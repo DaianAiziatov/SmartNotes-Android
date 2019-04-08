@@ -1,6 +1,7 @@
 package com.lambton.daianaiziatov.smartnotes;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -61,8 +62,8 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.Note
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
         String date = dateFormat.format(note.getDate());
         String subtitle = date + " - " + details;
-        holder.titleTextView.setText(Html.fromHtml(title));
-        holder.subtitleTextView.setText(Html.fromHtml(subtitle));
+        holder.titleTextView.setText(Html.fromHtml(title).toString());
+        holder.subtitleTextView.setText(Html.fromHtml(subtitle).toString());
     }
 
     public void updateNotesList(ArrayList<Note> newNotes) {
@@ -102,8 +103,6 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.Note
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
-
-
 
         @Override
         public void onClick(View v) {

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -34,6 +35,9 @@ import com.lambton.daianaiziatov.smartnotes.Database.DatabaseNote;
 import com.lambton.daianaiziatov.smartnotes.Database.Note;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +67,15 @@ public class ShowNoteActivity extends AppCompatActivity {
         note = getIntent().getParcelableExtra("note");
         if (note != null) {
             savedStateOfNote = note.getDetails();
-            noteEditText.setText(Html.fromHtml(note.getDetails()));
+            Html.ImageGetter imageGetter = new Html.ImageGetter() {
+                @Override
+                public Drawable getDrawable(String source) {
+                    Drawable image = new BitmapDrawable(getResources(), getBitmapFromURL(source));
+                    image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
+                    return image;
+                }
+            };
+            noteEditText.setText(Html.fromHtml(note.getDetails(), imageGetter, null));
         }
     }
 
@@ -203,11 +215,11 @@ public class ShowNoteActivity extends AppCompatActivity {
             newNote.setDate(new Date(new java.util.Date().getTime()));
             if (isNew) {
                 databaseNote.insert(newNote);
+                Log.d("TEST", "Successfully saved");
             } else {
                 databaseNote.update(newNote);
+                Log.d("TEST", "Successfully updated");
             }
-            Log.d("TEST", databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "ASC").size() + " items in notes (from show)");
-            Toast.makeText(this, "Successfully saved", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -235,5 +247,15 @@ public class ShowNoteActivity extends AppCompatActivity {
         Uri uri = Uri.fromParts("package", getPackageName(), null);
         intent.setData(uri);
         startActivityForResult(intent, 101);
+    }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            return image;
+        } catch(IOException e) {
+            return null;
+        }
     }
 }

@@ -54,6 +54,7 @@ public class DatabaseNote {
                         {
                                 String.valueOf(note.getNoteId())
                         });
+        database.setTransactionSuccessful();
         database.endTransaction();
         database.close();
     }

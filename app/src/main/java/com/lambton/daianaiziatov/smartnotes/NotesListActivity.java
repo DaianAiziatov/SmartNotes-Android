@@ -56,7 +56,7 @@ public class NotesListActivity extends AppCompatActivity implements SearchView.O
         });
 
         databaseNote = new DatabaseNote(this);
-        notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "ASC");
+        notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "DESC");
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -68,7 +68,7 @@ public class NotesListActivity extends AppCompatActivity implements SearchView.O
     @Override
     protected void onResume() {
         super.onResume();
-        notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "ASC");
+        notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "DESC");
         notesListAdapter.updateNotesList(notes);
     }
 
