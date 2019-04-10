@@ -1,4 +1,4 @@
-package com.lambton.daianaiziatov.smartnotes;
+package com.lambton.daianaiziatov.smartnotes.Activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -26,6 +26,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.lambton.daianaiziatov.smartnotes.R;
 
 import java.util.List;
 

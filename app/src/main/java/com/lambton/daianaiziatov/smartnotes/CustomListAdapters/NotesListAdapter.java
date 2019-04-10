@@ -1,7 +1,6 @@
-package com.lambton.daianaiziatov.smartnotes;
+package com.lambton.daianaiziatov.smartnotes.CustomListAdapters;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -13,9 +12,10 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lambton.daianaiziatov.smartnotes.Database.Note;
+import com.lambton.daianaiziatov.smartnotes.R;
+import com.lambton.daianaiziatov.smartnotes.RecyclerViewClickListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,9 +44,9 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.Note
     public NoteViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
 
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_view_item, parent, false);
-        NoteViewHolder studentViewHolder = new NoteViewHolder(itemView);
+        NoteViewHolder noteViewHolder = new NoteViewHolder(itemView);
 
-        return studentViewHolder;
+        return noteViewHolder;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
