@@ -81,7 +81,7 @@ public class DatabaseNote {
                 Note student = new Note();
                 student.setNoteId(cursor.getString(0));
                 student.setDetails(cursor.getString(1));
-                student.setDateFromLong(cursor.getInt(2));
+                student.setDateFromLong(cursor.getLong(2));
                 student.setLocationLatitude(cursor.getDouble(3));
                 student.setLocationLongitude(cursor.getDouble(4));
                 student.setRecordingsFromString(cursor.getString(5));

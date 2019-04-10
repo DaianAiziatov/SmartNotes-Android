@@ -309,7 +309,8 @@ public class ShowNoteActivity extends AppCompatActivity {
 
     private void save() {
         if (!noteEditText.getText().equals(savedStateOfNote) ||
-                lattitude != 0 && longitude != 0) {
+                lattitude != 0.0 && longitude != 0.0) {
+            Log.d("TEST", "latitude: " + lattitude + " longitude " + longitude );
             Note newNote;
             boolean isNew = true;
             if (note != null) {
@@ -325,6 +326,8 @@ public class ShowNoteActivity extends AppCompatActivity {
             Log.d(TAG, htmlDetails);
             newNote.setDetails(htmlDetails);
             newNote.setDate(new Date(new java.util.Date().getTime()));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");
+            Log.d("TEST", "Date: " + dateFormat.format(newNote.getDate()));
             newNote.setLocationLatitude(lattitude);
             newNote.setLocationLongitude(longitude);
             if (isNew) {
