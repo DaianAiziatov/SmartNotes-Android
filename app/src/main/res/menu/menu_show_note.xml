@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.lambton.daianaiziatov.smartnotes.ShowNoteActivity">
+    tools:context="com.lambton.daianaiziatov.smartnotes.Activities.ShowNoteActivity">
 
     <item
         android:id="@+id/action_map"
@@ -10,5 +10,12 @@
         android:title="Map"
         app:showAsAction="ifRoom"
         android:icon="@android:drawable/ic_dialog_map"/>
+
+    <item
+        android:id="@+id/action_recordings"
+        android:orderInCategory="100"
+        android:title="Map"
+        app:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_media_play"/>
 
 </menu>

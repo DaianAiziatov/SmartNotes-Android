@@ -1,22 +1,21 @@
-package com.lambton.daianaiziatov.smartnotes;
+package com.lambton.daianaiziatov.smartnotes.Activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
 import android.text.Html;
 import android.text.Selection;
 import android.text.Spannable;
@@ -26,7 +25,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -37,12 +35,15 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.lambton.daianaiziatov.smartnotes.Database.DatabaseNote;
 import com.lambton.daianaiziatov.smartnotes.Database.Note;
+import com.lambton.daianaiziatov.smartnotes.GlideApp;
+import com.lambton.daianaiziatov.smartnotes.R;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +65,7 @@ public class ShowNoteActivity extends AppCompatActivity {
     private String savedStateOfNote;
     private double lattitude;
     private double longitude;
+    private MediaRecorder myAudioRecorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,8 +143,83 @@ public class ShowNoteActivity extends AppCompatActivity {
                 intent.putExtra("lattitude", lattitude);
                 intent.putExtra("longitude", longitude);
                 startActivityForResult(intent, REQUEST_LOCATION);
+                break;
+            case R.id.action_recordings:
+                Intent recordingsIntent = new Intent(this, ShowRecordingsActivity.class);
+                recordingsIntent.putExtra("noteid", note.getNoteId());
+                startActivityForResult(recordingsIntent, 0);
+                break;
         }
         return true;
+    }
+
+    @OnClick(R.id.fab_record)
+    void onRecordStartClick() {
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.RECORD_AUDIO)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            myAudioRecorder = new MediaRecorder();
+                            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                            DateFormat dateFormat = new SimpleDateFormat("MM-dd-yy_hh-mm-ss");
+                            File directory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + note.getNoteId());
+                            if (!directory.exists()) {
+                                directory.mkdir();
+                            }
+                            String outputFilePath = directory.getPath() + "/" + dateFormat.format(new Date(new java.util.Date().getTime())) + ".3gp";
+
+                            myAudioRecorder.setOutputFile(outputFilePath);
+                            Log.d("TEST", "filepath: " + outputFilePath);
+
+                            try {
+                                myAudioRecorder.prepare();
+                                myAudioRecorder.start();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ShowNoteActivity.this);
+                                builder.setTitle("Recording...");
+                                builder.setMessage("Press stop to save recording or cancel to dismiss");
+                                builder.setPositiveButton("Stop", (dialog, which) -> {
+                                    myAudioRecorder.stop();
+                                    myAudioRecorder.release();
+                                    myAudioRecorder = null;
+                                    dialog.cancel();
+                                });
+                                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                                    myAudioRecorder.stop();
+                                    myAudioRecorder.release();
+                                    myAudioRecorder = null;
+                                    // TODO: delete file
+                                    File fdelete = new File(outputFilePath);
+                                    if (fdelete.exists()) {
+                                        if (fdelete.delete()) {
+                                            Log.d("TEST","file Deleted :" + outputFilePath);
+                                        } else {
+                                            Log.d("TEST","file not Deleted :" + outputFilePath);
+                                        }
+                                    }
+                                    dialog.cancel();
+                                });
+                                builder.show();
+                            } catch (IllegalStateException ise) {
+                                Log.d("TEST","IllegalStateException: " + ise.getLocalizedMessage());
+                            } catch (IOException ioe) {
+                                Log.d("TEST","IOException: " + ioe.getLocalizedMessage());
+                            }
+                        }
+
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+                            showSettingsDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
     }
 
     @OnClick(R.id.fab_add_image)
@@ -259,6 +336,8 @@ public class ShowNoteActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
     /**
      * Showing Alert Dialog with Settings option

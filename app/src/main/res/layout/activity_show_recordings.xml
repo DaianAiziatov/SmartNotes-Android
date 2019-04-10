@@ -6,19 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".Activities.NotesListActivity"
-    tools:showIn="@layout/activity_notes_list">
+    tools:context=".Activities.ShowRecordingsActivity">
 
     <android.support.v7.widget.RecyclerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/notes_recycler_view"
+        android:id="@+id/recordings_recycler_view"
         xmlns:tools="http://schemas.android.com/tools"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activities.NotesListActivity"
-        tools:listitem="@layout/note_view_item">
+        tools:context=".Activities.ShowRecordingsActivity"
+        tools:listitem="@layout/recordings_item">
 
     </android.support.v7.widget.RecyclerView>
 

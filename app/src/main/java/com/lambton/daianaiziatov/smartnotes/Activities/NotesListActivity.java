@@ -1,4 +1,4 @@
-package com.lambton.daianaiziatov.smartnotes;
+package com.lambton.daianaiziatov.smartnotes.Activities;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -12,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +19,9 @@ import android.widget.Toast;
 
 import com.lambton.daianaiziatov.smartnotes.Database.DatabaseNote;
 import com.lambton.daianaiziatov.smartnotes.Database.Note;
+import com.lambton.daianaiziatov.smartnotes.CustomListAdapters.NotesListAdapter;
+import com.lambton.daianaiziatov.smartnotes.R;
+import com.lambton.daianaiziatov.smartnotes.RecyclerViewClickListener;
 
 import java.util.ArrayList;
 
