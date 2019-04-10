@@ -8,4 +8,24 @@
         app:showAsAction="always"
         android:icon="@android:drawable/ic_menu_search"/>
 
+    <item android:id="@+id/order_by_date_asc"
+        android:title="Order by date asc"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/order_by_date_desc"
+        android:title="Order by date desc"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/order_by_title_asc"
+        android:title="Order by title asc"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/order_by_title_desc"
+        android:title="Order by title desc"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="never"/>
+
 </menu>

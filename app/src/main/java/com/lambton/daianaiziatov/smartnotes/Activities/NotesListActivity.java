@@ -89,13 +89,23 @@ public class NotesListActivity extends AppCompatActivity implements SearchView.O
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.order_by_date_asc) {
+            notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "ASC");
+            notesListAdapter.updateNotesList(notes);
+            return true;
+        } else if (id == R.id.order_by_date_desc) {
+            notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DATE, "DESC");
+            notesListAdapter.updateNotesList(notes);
+            return true;
+        } else if (id == R.id.order_by_title_asc) {
+            notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DETAILS, "ASC");
+            notesListAdapter.updateNotesList(notes);
+            return true;
+        } else if (id == R.id.order_by_title_desc) {
+            notes = databaseNote.getAllNotes(DatabaseNote.KEY_NOTE_DETAILS, "DESC");
+            notesListAdapter.updateNotesList(notes);
             return true;
         }
 
